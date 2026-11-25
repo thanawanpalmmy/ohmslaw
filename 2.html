@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>งานช่างพื้นฐาน ม.2: หน่วยงานไฟฟ้าพื้นฐาน - กฎของโอห์มและสภาพต้านทานไฟฟ้า</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Prompt & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        sci: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        volt: {
+                            400: '#facc15',
+                            500: '#eab308',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-btn.active {
+            background-color: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+        }
+        .formula-var {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .formula-var:hover, .formula-var.active {
+            transform: translateY(-4px) scale(1.04);
+        }
+        input[type="range"] {
+            accent-color: #0284c7;
+            cursor: pointer;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col selection:bg-sci-500 selection:text-white">
+
+    <!-- Header & Navigation -->
+    <header class="bg-slate-900/95 text-white backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center text-slate-900 shadow-md shrink-0">
+                    <i data-lucide="zap" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="font-bold text-base sm:text-lg text-white leading-tight">รายวิชางานช่างพื้นฐาน</h1>
+                        <span class="px-2 py-0.5 text-[11px] font-bold rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">ระดับชั้น ม.2</span>
+                    </div>
+                    <p class="text-[11px] sm:text-xs text-cyan-300 truncate max-w-[240px] sm:max-w-none">หน่วยการเรียนรู้: งานไฟฟ้าพื้นฐาน เรื่อง กฎของโอห์มและสภาพต้านทานไฟฟ้า</p>
+                </div>
+            </div>
+
+            <!-- Navigation Pills (Desktop) -->
+            <nav class="hidden md:flex items-center gap-1.5 bg-slate-800 p-1.5 rounded-2xl border border-slate-700">
+                <button onclick="switchSection('formula')" id="nav-formula" class="tab-btn active px-4 py-1.5 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5">
+                    <i data-lucide="function-square" class="w-4 h-4"></i> 1. สูตรและกฎของโอห์ม
+                </button>
+                <button onclick="switchSection('lab')" id="nav-lab" class="tab-btn px-4 py-1.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <i data-lucide="flask-conical" class="w-4 h-4"></i> 2. ห้องทดลองจำลอง
+                </button>
+                <button onclick="switchSection('summary')" id="nav-summary" class="tab-btn px-4 py-1.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <i data-lucide="book-open" class="w-4 h-4"></i> 3. สรุปหลักการ
+                </button>
+                <button onclick="switchSection('quiz')" id="nav-quiz" class="tab-btn px-4 py-1.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+                    <i data-lucide="award" class="w-4 h-4"></i> 4. ฝึกคำนวณ & ควิซ
+                </button>
+            </nav>
+        </div>
+        
+        <!-- Mobile Navigation Bar -->
+        <div class="flex md:hidden overflow-x-auto border-t border-slate-800 px-3 py-2 gap-2 bg-slate-900 no-scrollbar">
+            <button onclick="switchSection('formula')" id="m-nav-formula" class="tab-btn active shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all">1. สูตร & กฎของโอห์ม</button>
+            <button onclick="switchSection('lab')" id="m-nav-lab" class="tab-btn shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 bg-slate-800 border border-slate-700">2. ห้องทดลองจำลอง</button>
+            <button onclick="switchSection('summary')" id="m-nav-summary" class="tab-btn shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 bg-slate-800 border border-slate-700">3. สรุปหลักการ</button>
+            <button onclick="switchSection('quiz')" id="m-nav-quiz" class="tab-btn shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-medium text-slate-300 bg-slate-800 border border-slate-700">4. ฝึกคำนวณ & ควิซ</button>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+        <!-- ========================================================= -->
+        <!-- SECTION 1: INTERACTIVE FORMULA & OHM'S LAW BREAKDOWN      -->
+        <!-- ========================================================= -->
+        <section id="sec-formula" class="space-y-8 animate-fade-in">
+            <!-- Hero Intro Banner -->
+            <div class="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-800 relative overflow-hidden">
+                <div class="relative z-10 max-w-3xl">
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-xs font-semibold">
+                            <i data-lucide="wrench" class="w-3.5 h-3.5"></i> รายวิชางานช่างพื้นฐาน (ม.2)
+                        </span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-400/20 text-cyan-300 border border-cyan-400/30 text-xs font-semibold">
+                            หน่วยการเรียนรู้: งานไฟฟ้าพื้นฐาน
+                        </span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-bold mb-3 leading-snug text-white">
+                        เรื่อง <span class="text-amber-400">กฎของโอห์ม</span> และ <span class="text-cyan-400">สภาพต้านทานไฟฟ้า</span>
+                    </h2>
+                    <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                        เรียนรู้ความสัมพันธ์ระหว่างชนิดและขนาดของสายไฟ (<span class="font-mono text-cyan-300 font-semibold">R = ρL/A</span>) กับการไหลของกระแสไฟฟ้าในวงจรตามกฎของโอห์ม (<span class="font-mono text-amber-300 font-semibold">I = V/R</span>) เพื่อการออกแบบและเลือกใช้อุปกรณ์ไฟฟ้าได้อย่างปลอดภัยในงานช่าง
+                    </p>
+                </div>
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="absolute right-10 top-6 opacity-15 hidden lg:block animate-float">
+                    <i data-lucide="cpu" class="w-36 h-36 text-amber-400"></i>
+                </div>
+            </div>
+
+            <!-- Interactive Equation Explorer -->
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-slate-800">เจาะลึกสมการสภาพต้านทานไฟฟ้า (R = ρL/A)</h3>
+                    <p class="text-sm text-slate-500 mt-1">ลอง <span class="text-sci-600 font-semibold underline decoration-dotted">คลิกหรือนำเมาส์ไปชี้ที่ตัวแปรแต่ละตัว</span> ในสมการด้านล่างเพื่อดูความหมาย</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <!-- Giant Formula Display -->
+                    <div class="lg:col-span-5 flex flex-col items-center justify-center bg-slate-50 rounded-3xl p-8 border-2 border-dashed border-slate-200 select-none">
+                        <div class="flex items-center justify-center gap-3 sm:gap-5 text-5xl sm:text-6xl font-bold font-mono">
+                            <!-- R -->
+                            <button onclick="selectVar('R')" onmouseenter="selectVar('R')" id="btn-var-R" 
+                                class="formula-var active w-20 h-24 rounded-2xl bg-rose-100 text-rose-600 border-2 border-rose-400 shadow-md flex flex-col items-center justify-center cursor-pointer">
+                                <span>R</span>
+                                <span class="text-[10px] font-sans font-semibold mt-1 uppercase tracking-wider">ความต้านทาน</span>
+                            </button>
+
+                            <span class="text-slate-400 text-4xl">=</span>
+
+                            <!-- Rho -->
+                            <button onclick="selectVar('rho')" onmouseenter="selectVar('rho')" id="btn-var-rho" 
+                                class="formula-var w-20 h-24 rounded-2xl bg-purple-50 text-purple-600 border-2 border-purple-200 hover:border-purple-400 flex flex-col items-center justify-center cursor-pointer">
+                                <span>ρ</span>
+                                <span class="text-[10px] font-sans font-semibold mt-1 uppercase tracking-wider">สภาพต้านทาน</span>
+                            </button>
+
+                            <!-- Fraction L / A -->
+                            <div class="flex flex-col items-center gap-2">
+                                <button onclick="selectVar('L')" onmouseenter="selectVar('L')" id="btn-var-L" 
+                                    class="formula-var w-20 h-20 rounded-2xl bg-emerald-50 text-emerald-600 border-2 border-emerald-200 hover:border-emerald-400 flex flex-col items-center justify-center cursor-pointer">
+                                    <span>L</span>
+                                    <span class="text-[10px] font-sans font-semibold mt-0.5">ความยาว</span>
+                                </button>
+                                
+                                <div class="w-24 h-1.5 bg-slate-800 rounded-full"></div>
+                                
+                                <button onclick="selectVar('A')" onmouseenter="selectVar('A')" id="btn-var-A" 
+                                    class="formula-var w-20 h-20 rounded-2xl bg-amber-50 text-amber-600 border-2 border-amber-200 hover:border-amber-400 flex flex-col items-center justify-center cursor-pointer">
+                                    <span>A</span>
+                                    <span class="text-[10px] font-sans font-semibold mt-0.5">พื้นที่หน้าตัด</span>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-6 flex items-center gap-1">
+                            <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i> แตะที่ตัวอักษร R, ρ, L หรือ A เพื่อเปลี่ยนคำอธิบาย
+                        </p>
+                    </div>
+
+                    <!-- Variable Explanation Card -->
+                    <div class="lg:col-span-7">
+                        <div id="var-detail-card" class="rounded-3xl p-6 sm:p-7 border-2 transition-all duration-300 bg-rose-50/50 border-rose-200">
+                            <!-- Dynamically populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Connection to Ohm's Law Box -->
+                <div class="mt-8 pt-6 border-t border-slate-100">
+                    <div class="bg-gradient-to-r from-slate-900 to-blue-950 rounded-2xl p-5 sm:p-6 text-white flex flex-col lg:flex-row items-center justify-between gap-6">
+                        <div class="space-y-2 max-w-2xl">
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-400 text-slate-950 text-xs font-bold">
+                                <i data-lucide="link" class="w-3.5 h-3.5"></i> ความเชื่อมโยงกับกฎของโอห์ม (Ohm's Law)
+                            </div>
+                            <h4 class="text-lg font-bold text-white">ความต้านทานของสายไฟ (R) ส่งผลต่อกระแสไฟฟ้า (I) อย่างไร?</h4>
+                            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                                ตามกฎของโอห์ม <strong>V = I × R</strong> หรือ <strong>I = V / R</strong> เมื่อแรงดันไฟฟ้า (V) คงที่ (เช่น ไฟบ้าน 220V):<br>
+                                • หากสายไฟมี <strong>R มาก</strong> (สายยาวหรือเส้นเล็ก) ➔ กระแสไฟฟ้า (<strong>I</strong>) จะ <strong>ไหลน้อยลง</strong> เกิดปัญหาไฟตกและสายร้อน<br>
+                                • หากสายไฟมี <strong>R น้อย</strong> (ทองแดงเส้นใหญ่) ➔ กระแสไฟฟ้า (<strong>I</strong>) จะ <strong>ไหลได้สะดวกเต็มที่</strong>
+                            </p>
+                        </div>
+                        <div class="shrink-0 bg-slate-800/90 border border-slate-700 rounded-2xl p-4 text-center min-w-[210px]">
+                            <div class="text-xs text-slate-400 mb-1">สูตรกฎของโอห์ม</div>
+                            <div class="font-mono text-2xl font-bold text-amber-400">V = I × R</div>
+                            <div class="h-px bg-slate-700 my-2"></div>
+                            <div class="font-mono text-lg font-bold text-cyan-300">I = V ÷ R</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Step CTA -->
+            <div class="flex justify-end">
+                <button onclick="switchSection('lab')" class="px-6 py-3.5 rounded-2xl bg-sci-600 hover:bg-sci-700 text-white font-semibold shadow-md shadow-sci-500/20 flex items-center gap-2 transition-all hover:translate-x-1">
+                    <span>ไปทดลองปรับค่า R และกฎของโอห์มในห้องแล็บ!</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </section>
+
+
+        <!-- ========================================================= -->
+        <!-- SECTION 2: INTERACTIVE VIRTUAL LAB (3D WIRE & OHM'S LAW)  -->
+        <!-- ========================================================= -->
+        <section id="sec-lab" class="hidden space-y-6 animate-fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                        <i data-lucide="flask-conical" class="w-7 h-7 text-sci-600"></i>
+                        ห้องปฏิบัติการจำลอง: สภาพต้านทานไฟฟ้า & กฎของโอห์ม
+                    </h2>
+                    <p class="text-sm text-slate-500">ปรับชนิดวัสดุ ความยาว (L) พื้นที่หน้าตัด (A) และแรงดันไฟฟ้า (V) เพื่อดูผลลัพธ์แบบ Real-time</p>
+                </div>
+                <button onclick="resetLab()" class="self-start sm:self-auto px-4 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-colors">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> รีเซ็ตค่าเริ่มต้น
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left/Top: 3D Wire Canvas & Live Math Output -->
+                <div class="lg:col-span-8 space-y-6">
+                    <!-- Simulation Canvas Wrapper -->
+                    <div class="bg-slate-900 rounded-3xl p-4 sm:p-6 shadow-xl border border-slate-800 relative overflow-hidden">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3 text-xs">
+                            <div class="flex items-center gap-4 text-slate-300">
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block shadow-[0_0_8px_#facc15]"></span> อิเล็กตรอนอิสระ (กระแส I)
+                                </span>
+                                <span class="flex items-center gap-1.5">
+                                    <span class="w-3 h-3 rounded-full bg-rose-500/80 border border-rose-300 inline-block"></span> อะตอมสิ่งกีดขวาง (ρ)
+                                </span>
+                            </div>
+                            <span id="sim-speed-badge" class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-medium border border-emerald-500/30">
+                                ความเร็วอิเล็กตรอน: ไหลคล่องตัวมาก
+                            </span>
+                        </div>
+
+                        <!-- HTML5 Canvas -->
+                        <div class="w-full h-64 sm:h-72 rounded-2xl bg-slate-950/90 border border-slate-800 relative flex items-center justify-center overflow-hidden">
+                            <canvas id="wireCanvas" class="w-full h-full block"></canvas>
+                            
+                            <!-- Direction Arrows Overlay -->
+                            <div class="absolute bottom-3 left-4 right-4 flex justify-between items-center text-[11px] text-slate-400 pointer-events-none">
+                                <span>ขั้วลบ (-) แหล่งจ่ายไฟ</span>
+                                <span id="canvas-voltage-label" class="px-2.5 py-0.5 rounded-full bg-slate-900/90 border border-amber-400/40 text-amber-300 font-mono">แรงดันแหล่งจ่าย V = 12 V</span>
+                                <span>ขั้วบวก (+)</span>
+                            </div>
+                        </div>
+
+                        <!-- Resistance Meter Bar -->
+                        <div class="mt-4 bg-slate-800/80 rounded-2xl p-4 border border-slate-700/80">
+                            <div class="flex items-center justify-between text-sm mb-2">
+                                <span class="text-slate-300 font-medium">ระดับความต้านทานไฟฟ้า (R):</span>
+                                <span id="resistance-level-text" class="font-bold text-emerald-400">ต่ำ (นำไฟฟ้าได้ดีมาก)</span>
+                            </div>
+                            <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden p-0.5">
+                                <div id="resistance-meter-bar" class="h-full rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-all duration-300" style="width: 15%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step Live Calculation Box (Both Resistivity & Ohm's Law) -->
+                    <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+                        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="calculator" class="w-5 h-5 text-sci-600"></i>
+                            ผลการคำนวณแบบ Real-time (สภาพต้านทาน & กฎของโอห์ม)
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Box 1: R = rho L / A -->
+                            <div class="bg-sci-50/70 rounded-2xl p-4 border border-sci-100 font-mono text-xs sm:text-sm space-y-2">
+                                <div class="font-sans font-bold text-sci-800 text-xs uppercase tracking-wider flex items-center justify-between">
+                                    <span>1. หาความต้านทาน (R = ρL/A)</span>
+                                    <span class="px-2 py-0.5 rounded bg-white text-sci-700 border border-sci-200">หน่วย: Ω</span>
+                                </div>
+                                <div class="text-slate-600 text-xs break-all" id="calc-step-2">
+                                    R = (1.68×10⁻⁸) × (2.0 / 4.0×10⁻⁶)
+                                </div>
+                                <div class="pt-1.5 border-t border-sci-200/60">
+                                    <div class="text-lg sm:text-xl font-bold text-sci-700" id="calc-result-ohm">R = 0.0084 Ω</div>
+                                    <div class="font-sans text-[11px] text-slate-500" id="calc-result-milliohm">(หรือ 8.40 มิลลิโอห์ม mΩ)</div>
+                                </div>
+                            </div>
+
+                            <!-- Box 2: Ohm's Law I = V / R -->
+                            <div class="bg-amber-50/70 rounded-2xl p-4 border border-amber-200/80 font-mono text-xs sm:text-sm space-y-2">
+                                <div class="font-sans font-bold text-amber-900 text-xs uppercase tracking-wider flex items-center justify-between">
+                                    <span>2. กฎของโอห์ม (I = V / R)</span>
+                                    <span class="px-2 py-0.5 rounded bg-white text-amber-800 border border-amber-200">หน่วย: A</span>
+                                </div>
+                                <div class="text-slate-600 text-xs" id="calc-ohm-step">
+                                    I = 12 V / 0.0084 Ω
+                                </div>
+                                <div class="pt-1.5 border-t border-amber-200/60">
+                                    <div class="text-lg sm:text-xl font-bold text-amber-700" id="calc-result-amp">I = 1,428.57 A</div>
+                                    <div class="font-sans text-[11px] text-slate-500">กระแสไฟฟ้าที่ไหลผ่านเส้นลวดนี้</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Practical Technician Tip Box -->
+                        <div id="tech-advice-box" class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm text-emerald-900 flex items-start gap-2.5">
+                            <i data-lucide="hard-hat" class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5"></i>
+                            <div id="tech-advice-text">
+                                <strong>คำแนะนำงานช่าง:</strong> เหมาะสำหรับใช้เป็นสายไฟเดินวงจรไฟฟ้าทั่วไปในบ้าน นำไฟฟ้าได้ดีเยี่ยมและไม่เกิดความร้อนสะสม
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Interactive Sliders & Material Selector -->
+                <div class="lg:col-span-4 space-y-4">
+                    <!-- Control 1: Material (Rho) -->
+                    <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                                <span class="w-6 h-6 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center font-mono font-bold">ρ</span>
+                                1. ชนิดของวัสดุ
+                            </label>
+                            <span id="display-rho" class="font-mono text-xs font-bold px-2 py-0.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200">
+                                1.68 × 10⁻⁸ Ω·m
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-2" id="material-buttons">
+                            <!-- Buttons generated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Control 2: Length (L) -->
+                    <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="slider-L" class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                                <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-mono font-bold">L</span>
+                                2. ความยาวสายไฟ
+                            </label>
+                            <span id="display-L" class="font-mono text-sm font-bold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                2.0 m
+                            </span>
+                        </div>
+                        <input type="range" id="slider-L" min="1" max="10" step="0.5" value="2" class="w-full my-2.5" oninput="updateLabParams()">
+                        <div class="flex justify-between text-[11px] text-slate-400 font-medium">
+                            <span>สั้น (1 m)</span>
+                            <span>ปานกลาง (5 m)</span>
+                            <span>ยาวมาก (10 m)</span>
+                        </div>
+                    </div>
+
+                    <!-- Control 3: Area (A) -->
+                    <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="slider-A" class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                                <span class="w-6 h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-mono font-bold">A</span>
+                                3. พื้นที่หน้าตัดสายไฟ
+                            </label>
+                            <span id="display-A" class="font-mono text-sm font-bold px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-700 border border-amber-200">
+                                4.0 mm²
+                            </span>
+                        </div>
+                        <input type="range" id="slider-A" min="1" max="10" step="0.5" value="4" class="w-full my-2.5" oninput="updateLabParams()">
+                        <div class="flex justify-between text-[11px] text-slate-400 font-medium">
+                            <span>เส้นเล็ก (1 mm²)</span>
+                            <span>ปานกลาง (5 mm²)</span>
+                            <span>เส้นใหญ่ (10 mm²)</span>
+                        </div>
+                    </div>
+
+                    <!-- Control 4: Voltage (V) for Ohm's Law -->
+                    <div class="bg-white rounded-3xl border border-slate-200 p-4 sm:p-5 shadow-sm">
+                        <div class="flex items-center justify-between mb-1">
+                            <label for="slider-V" class="font-bold text-slate-800 flex items-center gap-2 text-sm">
+                                <span class="w-6 h-6 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center font-mono font-bold">V</span>
+                                4. แรงดันไฟฟ้า (กฎของโอห์ม)
+                            </label>
+                            <span id="display-V" class="font-mono text-sm font-bold px-2.5 py-0.5 rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200">
+                                12 V
+                            </span>
+                        </div>
+                        <input type="range" id="slider-V" min="1.5" max="24" step="1.5" value="12" class="w-full my-2.5" oninput="updateLabParams()">
+                        <div class="flex justify-between text-[11px] text-slate-400 font-medium">
+                            <span>ถ่านไฟฉาย (1.5V)</span>
+                            <span>แบตเตอรี่ (12V)</span>
+                            <span>24V</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================================= -->
+        <!-- SECTION 3: SUMMARY OF PRINCIPLES                          -->
+        <!-- ========================================================= -->
+        <section id="sec-summary" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-11 h-11 rounded-2xl bg-sci-100 text-sci-600 flex items-center justify-center">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">สรุปหลักการสำคัญสำหรับงานช่างไฟฟ้า</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ความสัมพันธ์ของตัวแปรในสูตรสภาพต้านทานไฟฟ้าและกฎของโอห์ม</p>
+                    </div>
+                </div>
+
+                <!-- 3 Key Relationships Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <!-- Rule 1 -->
+                    <div class="rounded-2xl border-2 border-purple-100 bg-purple-50/40 p-5 space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-purple-600 text-white font-mono font-bold text-xl flex items-center justify-center shadow-sm">ρ</div>
+                        <h3 class="font-bold text-slate-800 text-base">1. ขึ้นอยู่กับ "ชนิดของวัสดุ"</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                            โลหะแต่ละชนิดมีค่าสภาพต้านทานไฟฟ้า (<strong>ρ</strong>) ไม่เท่ากัน <strong>เงิน</strong>และ<strong>ทองแดง</strong>มีค่า ρ ต่ำมากจึงนำไฟฟ้าได้ดีเยี่ยม นิยมใช้ทำสายไฟ ส่วน<strong>ลวดนิโครม</strong>มีค่า ρ สูงจึงต้านทานมากและเกิดความร้อน นิยมใช้ทำขดลวดเตารีด
+                        </p>
+                        <div class="px-3 py-2 rounded-xl bg-white border border-purple-200 text-xs font-semibold text-purple-800">
+                            สรุป: ρ มาก ➔ R มาก (นำไฟฟ้าได้น้อย)
+                        </div>
+                    </div>
+
+                    <!-- Rule 2 -->
+                    <div class="rounded-2xl border-2 border-emerald-100 bg-emerald-50/40 p-5 space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white font-mono font-bold text-xl flex items-center justify-center shadow-sm">L</div>
+                        <h3 class="font-bold text-slate-800 text-base">2. แปรผันตรงกับ "ความยาวสายไฟ"</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                            ยิ่งลวดตัวนำ<strong>ยาวมากขึ้น (L มาก)</strong> อิเล็กตรอนยิ่งต้องเดินทางไกลและชนกับอะตอมของโลหะมากขึ้น เปรียบเหมือนการเดินผ่านอุโมงค์ที่ยาวขึ้น ความต้านทานจึงเพิ่มขึ้นตามไปด้วย
+                        </p>
+                        <div class="px-3 py-2 rounded-xl bg-white border border-emerald-200 text-xs font-semibold text-emerald-800">
+                            สรุป: สายยาว (L มาก) ➔ R มาก (ไฟตกง่าย)
+                        </div>
+                    </div>
+
+                    <!-- Rule 3 -->
+                    <div class="rounded-2xl border-2 border-amber-100 bg-amber-50/40 p-5 space-y-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500 text-white font-mono font-bold text-xl flex items-center justify-center shadow-sm">A</div>
+                        <h3 class="font-bold text-slate-800 text-base">3. แปรผกผันกับ "พื้นที่หน้าตัด"</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                            ยิ่งสายไฟ<strong>เส้นใหญ่ขึ้น (A มาก)</strong> อิเล็กตรอนยิ่งมีช่องทางเดินกว้างขวาง ไม่เบียดเสียดกัน เปรียบเหมือนถนนหลายเลน ทำให้ความต้านทานลดลงและกระแสไหลได้สะดวก
+                        </p>
+                        <div class="px-3 py-2 rounded-xl bg-white border border-amber-200 text-xs font-semibold text-amber-800">
+                            สรุป: เส้นใหญ่ (A มาก) ➔ R น้อย (ปลอดภัย)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reference Table of Materials -->
+                <div class="mt-8">
+                    <h3 class="font-bold text-slate-800 text-base mb-3 flex items-center gap-2">
+                        <i data-lucide="table" class="w-5 h-5 text-sci-600"></i>
+                        ตารางเปรียบเทียบค่าสภาพต้านทานไฟฟ้า (ρ) ของวัสดุที่พบบ่อยในงานช่าง (ที่อุณหภูมิ 20°C)
+                    </h3>
+                    <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-4">ชนิดวัสดุ</th>
+                                    <th class="py-3 px-4 font-mono">สภาพต้านทาน ρ (Ω·m)</th>
+                                    <th class="py-3 px-4">การนำไปใช้งานในงานช่างพื้นฐาน</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 bg-white">
+                                <tr>
+                                    <td class="py-3 px-4 font-semibold text-slate-800">1. เงิน (Silver)</td>
+                                    <td class="py-3 px-4 font-mono text-sci-700">1.59 × 10⁻⁸</td>
+                                    <td class="py-3 px-4 text-slate-600">นำไฟฟ้าดีที่สุด แต่ราคาแพง ใช้ทำหน้าสัมผัสสวิตช์/รีเลย์คุณภาพสูง</td>
+                                </tr>
+                                <tr class="bg-amber-50/40">
+                                    <td class="py-3 px-4 font-semibold text-amber-900">2. ทองแดง (Copper)</td>
+                                    <td class="py-3 px-4 font-mono text-amber-800 font-bold">1.68 × 10⁻⁸</td>
+                                    <td class="py-3 px-4 text-slate-700"><strong>มาตรฐานสายไฟบ้านและสายอุปกรณ์ไฟฟ้า</strong> ราคาคุ้มค่า นำไฟฟ้าดีเยี่ยม</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-semibold text-slate-800">3. ทองคำ (Gold)</td>
+                                    <td class="py-3 px-4 font-mono text-sci-700">2.44 × 10⁻⁸</td>
+                                    <td class="py-3 px-4 text-slate-600">ไม่เป็นสนิม ใช้เคลือบขาชิปอิเล็กทรอนิกส์และหัวเชื่อมต่อสัญญาณ</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-semibold text-slate-800">4. อะลูมิเนียม (Aluminum)</td>
+                                    <td class="py-3 px-4 font-mono text-sci-700">2.82 × 10⁻⁸</td>
+                                    <td class="py-3 px-4 text-slate-600">น้ำหนักเบา ราคาถูก ใช้ทำสายส่งไฟฟ้าแรงสูงบนเสาไฟฟ้า</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-semibold text-rose-700">5. ลวดนิโครม (Nichrome)</td>
+                                    <td class="py-3 px-4 font-mono text-rose-700 font-bold">1.10 × 10⁻⁶</td>
+                                    <td class="py-3 px-4 text-slate-600">สภาพต้านทานสูงมาก ใช้ทำขดลวดความร้อนในเตารีด ไดร์เป่าผม กาต้มน้ำ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================================= -->
+        <!-- SECTION 4: WORKED EXAMPLES & 5-QUESTION QUIZ              -->
+        <!-- ========================================================= -->
+        <section id="sec-quiz" class="hidden space-y-8 animate-fade-in">
+            
+            <!-- Part A: Step-by-Step Calculation Practice -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                        <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">ส่วนที่ 1: ตัวอย่างโจทย์คำนวณ (สภาพต้านทาน & กฎของโอห์ม)</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">ลองอ่านโจทย์และคิดคำตอบในใจก่อนกดปุ่ม "ดูวิธีทำละเอียด"</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <!-- Practice Problem 1 -->
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 flex flex-col justify-between">
+                        <div>
+                            <span class="px-2.5 py-0.5 rounded-md bg-indigo-100 text-indigo-700 text-xs font-bold">ตัวอย่างที่ 1 (หาความต้านทาน R = ρL/A)</span>
+                            <p class="text-sm text-slate-800 font-medium mt-3 leading-relaxed">
+                                ลวดโลหะชนิดหนึ่งมีความยาว <strong>5 เมตร</strong> มีพื้นที่หน้าตัด <strong>2 × 10⁻⁶ ตารางเมตร</strong> และมีสภาพต้านทานไฟฟ้า <strong>1.6 × 10⁻⁸ โอห์ม·เมตร</strong> จงหาความต้านทานไฟฟ้าของลวดเส้นนี้
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button onclick="toggleSolution('sol-1')" class="w-full py-2.5 px-4 rounded-xl bg-white border border-indigo-200 text-indigo-600 hover:bg-indigo-50 text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+                                <i data-lucide="eye" class="w-4 h-4"></i> ดูวิธีทำละเอียดทีละขั้นตอน
+                            </button>
+                            <div id="sol-1" class="hidden mt-3 p-4 rounded-xl bg-white border border-indigo-100 text-xs sm:text-sm space-y-2 text-slate-700 font-mono">
+                                <p class="font-sans font-bold text-indigo-700">วิธีทำ:</p>
+                                <p>1. สิ่งที่โจทย์กำหนด:<br>
+                                   &nbsp;&nbsp;ρ = 1.6 × 10⁻⁸ Ω·m<br>
+                                   &nbsp;&nbsp;L = 5 m<br>
+                                   &nbsp;&nbsp;A = 2 × 10⁻⁶ m²</p>
+                                <p>2. จากสูตร: R = ρ × (L / A)</p>
+                                <p>3. แทนค่า:<br>
+                                   &nbsp;&nbsp;R = (1.6 × 10⁻⁸) × (5 / 2 × 10⁻⁶)<br>
+                                   &nbsp;&nbsp;R = (1.6 × 10⁻⁸) × (2.5 × 10⁶)<br>
+                                   &nbsp;&nbsp;R = 4.0 × 10⁻² = <strong>0.04 โอห์ม (Ω)</strong></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Practice Problem 2 -->
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 flex flex-col justify-between">
+                        <div>
+                            <span class="px-2.5 py-0.5 rounded-md bg-amber-100 text-amber-800 text-xs font-bold">ตัวอย่างที่ 2 (เชื่อมโยงกฎของโอห์ม I = V/R)</span>
+                            <p class="text-sm text-slate-800 font-medium mt-3 leading-relaxed">
+                                ขดลวดทำความร้อนนิโครมมีความต้านทานไฟฟ้า <strong>44 โอห์ม</strong> เมื่อนำไปต่อเข้ากับแรงดันไฟฟ้าบ้าน <strong>220 โวลต์</strong> จะมีกระแสไฟฟ้าไหลผ่านขดลวดนี้กี่แอมแปร์?
+                            </p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button onclick="toggleSolution('sol-2')" class="w-full py-2.5 px-4 rounded-xl bg-white border border-amber-300 text-amber-700 hover:bg-amber-50 text-sm font-semibold flex items-center justify-center gap-2 transition-colors">
+                                <i data-lucide="eye" class="w-4 h-4"></i> ดูวิธีทำละเอียดทีละขั้นตอน
+                            </button>
+                            <div id="sol-2" class="hidden mt-3 p-4 rounded-xl bg-white border border-amber-200 text-xs sm:text-sm space-y-2 text-slate-700 font-mono">
+                                <p class="font-sans font-bold text-amber-800">วิธีทำ:</p>
+                                <p>1. สิ่งที่โจทย์กำหนด:<br>
+                                   &nbsp;&nbsp;V = 220 โวลต์ (V)<br>
+                                   &nbsp;&nbsp;R = 44 โอห์ม (Ω)</p>
+                                <p>2. จากกฎของโอห์ม: I = V ÷ R</p>
+                                <p>3. แทนค่า:<br>
+                                   &nbsp;&nbsp;I = 220 ÷ 44<br>
+                                   &nbsp;&nbsp;I = <strong>5 แอมแปร์ (A)</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Part B: 5-Question Interactive Quiz -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">ส่วนที่ 2: แบบทดสอบท้ายหน่วย (5 ข้อ)</h2>
+                            <p class="text-xs sm:text-sm text-slate-500">หน่วยการเรียนรู้: งานไฟฟ้าพื้นฐาน เรื่อง กฎของโอห์มและสภาพต้านทานไฟฟ้า</p>
+                        </div>
+                    </div>
+                    <div id="quiz-score-badge" class="hidden px-4 py-2 rounded-2xl bg-sci-600 text-white font-bold text-sm shadow-sm">
+                        คะแนนของคุณ: 0 / 5
+                    </div>
+                </div>
+
+                <!-- Quiz Questions Container -->
+                <div id="quiz-container" class="space-y-6">
+                    <!-- Rendered dynamically by JS -->
+                </div>
+
+                <!-- Quiz Action Buttons -->
+                <div class="mt-8 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                    <p id="quiz-warning" class="text-sm text-rose-600 font-medium hidden">
+                        * กรุณาตอบคำถามให้ครบทั้ง 5 ข้อก่อนกดส่งคำตอบนะครับ
+                    </p>
+                    <div class="flex gap-3 ml-auto">
+                        <button onclick="resetQuiz()" id="btn-retry-quiz" class="hidden px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm flex items-center gap-2 transition-colors">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> ทำแบบทดสอบอีกครั้ง
+                        </button>
+                        <button onclick="submitQuiz()" id="btn-submit-quiz" class="px-7 py-3 rounded-2xl bg-gradient-to-r from-sci-600 to-indigo-600 hover:from-sci-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-md flex items-center gap-2 transition-all">
+                            <i data-lucide="check-circle-2" class="w-5 h-5"></i> ตรวจคำตอบและดูคะแนน
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 mt-12">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+            <p class="text-slate-300">รายวิชางานช่างพื้นฐาน (ม.2) | หน่วยการเรียนรู้: งานไฟฟ้าพื้นฐาน เรื่อง กฎของโอห์มและสภาพต้านทานไฟฟ้า</p>
+            <p class="text-slate-500">สื่อการเรียนรู้เชิงโต้ตอบ (Interactive Learning)</p>
+        </div>
+    </footer>
+
+    <!-- ========================================================= -->
+    <!-- JAVASCRIPT LOGIC                                          -->
+    <!-- ========================================================= -->
+    <script>
+        // ---------------------------------------------------------
+        // 1. FORMULA VARIABLE EXPLANATION DATA (Section 1)
+        // ---------------------------------------------------------
+        const VAR_DATA = {
+            R: {
+                symbol: 'R',
+                name: 'ความต้านทานไฟฟ้า (Electrical Resistance)',
+                unit: 'โอห์ม (Ohm : Ω)',
+                colorClass: 'bg-rose-50/60 border-rose-200',
+                badgeClass: 'bg-rose-100 text-rose-700',
+                desc: 'คือ สมบัติของตัวนำในการต้านการไหลของกระแสไฟฟ้า ยิ่งค่า R มาก กระแสไฟฟ้า (I) จะไหลผ่านได้ยากและเปลี่ยนพลังงานไฟฟ้าเป็นความร้อนมากขึ้น',
+                analogy: 'เปรียบเทียบในงานช่าง: เหมือนสิ่งกีดขวางในท่อน้ำ ยิ่งมีสิ่งกีดขวางมาก น้ำก็ยิ่งไหลช้าและเกิดแรงดันตกที่ปลายสาย'
+            },
+            rho: {
+                symbol: 'ρ',
+                name: 'สภาพต้านทานไฟฟ้า (Electrical Resistivity)',
+                unit: 'โอห์ม·เมตร (Ω·m)',
+                colorClass: 'bg-purple-50/60 border-purple-200',
+                badgeClass: 'bg-purple-100 text-purple-700',
+                desc: 'อ่านว่า "โร" (Rho) เป็นค่าเฉพาะตัวที่ขึ้นอยู่กับ "ชนิดของวัสดุ" โลหะแต่ละชนิดมีโครงสร้างอะตอมต่างกัน เช่น ทองแดงมีค่า ρ ต่ำมากจึงนำไฟฟ้าได้ดี ส่วนนิโครมมีค่า ρ สูงมากจึงเกิดความร้อนง่าย',
+                analogy: 'เปรียบเทียบในงานช่าง: เหมือนพื้นผิวถนน ถนนลาดยางเรียบ (ทองแดง) รถวิ่งฉิว แต่ถนนลูกรังขรุขระ (นิโครม) รถวิ่งช้าและเกิดการเสียดสีสูง'
+            },
+            L: {
+                symbol: 'L',
+                name: 'ความยาวของลวดตัวนำ (Length)',
+                unit: 'เมตร (m)',
+                colorClass: 'bg-emerald-50/60 border-emerald-200',
+                badgeClass: 'bg-emerald-100 text-emerald-700',
+                desc: 'คือ ความยาวทั้งหมดของเส้นลวดจากต้นทางถึงปลายทาง ค่า R จะ "แปรผันตรง" กับความยาว L (ยิ่งสายยาวมาก ความต้านทานยิ่งมากตามไปด้วย)',
+                analogy: 'เปรียบเทียบในงานช่าง: การลากปลั๊กพ่วงสายไฟยาว 50 เมตรไปใช้กับสว่านหรือเครื่องเชื่อม จะทำให้เกิดอาการ "ไฟตก" เพราะความต้านทานสูงขึ้นตามความยาว'
+            },
+            A: {
+                symbol: 'A',
+                name: 'พื้นที่หน้าตัดของลวดตัวนำ (Cross-sectional Area)',
+                unit: 'ตารางเมตร (m²) หรือ ตารางมิลลิเมตร (mm²)',
+                colorClass: 'bg-amber-50/60 border-amber-200',
+                badgeClass: 'bg-amber-100 text-amber-800',
+                desc: 'คือ ขนาดความอ้วนหรือพื้นที่หน้าตัดวงกลมของเส้นลวด ค่า R จะ "แปรผกผัน" กับพื้นที่หน้าตัด A (ยิ่งสายเส้นใหญ่ ความต้านทานยิ่งน้อย)',
+                analogy: 'เปรียบเทียบในงานช่าง: เบอร์สายไฟ เช่น 1.5 mm² (ใช้กับหลอดไฟ) กับ 4.0 mm² (ใช้กับเครื่องทำน้ำอุ่นหรือแอร์) สายเส้นใหญ่ช่วยให้กระแสไหลสะดวก ไม่ร้อนจนไฟไหม้'
+            }
+        };
+
+        function selectVar(key) {
+            const data = VAR_DATA[key];
+            if (!data) return;
+
+            // Update button active styles
+            ['R', 'rho', 'L', 'A'].forEach(k => {
+                const btn = document.getElementById(`btn-var-${k}`);
+                if (!btn) return;
+                if (k === key) {
+                    btn.classList.add('active', 'shadow-md');
+                } else {
+                    btn.classList.remove('active', 'shadow-md');
+                }
+            });
+
+            // Update explanation card
+            const card = document.getElementById('var-detail-card');
+            card.className = `rounded-3xl p-6 sm:p-7 border-2 transition-all duration-300 ${data.colorClass}`;
+            card.innerHTML = `
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <span class="px-3 py-1 rounded-xl font-mono font-bold text-sm ${data.badgeClass}">ตัวแปร: ${data.symbol}</span>
+                    <span class="text-xs font-mono font-semibold text-slate-600 bg-white px-3 py-1 rounded-xl border border-slate-200">หน่วย SI: ${data.unit}</span>
+                </div>
+                <h4 class="text-lg sm:text-xl font-bold text-slate-800 mb-2">${data.name}</h4>
+                <p class="text-sm text-slate-700 leading-relaxed mb-4">${data.desc}</p>
+                <div class="p-3.5 rounded-2xl bg-white/90 border border-slate-200/80 text-xs sm:text-sm text-slate-700 flex items-start gap-2.5">
+                    <i data-lucide="lightbulb" class="w-5 h-5 text-amber-500 shrink-0 mt-0.5"></i>
+                    <span>${data.analogy}</span>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+
+        // ---------------------------------------------------------
+        // 2. VIRTUAL LAB & 3D WIRE SIMULATION DATA (Section 2)
+        // ---------------------------------------------------------
+        const MATERIALS = [
+            {
+                id: 'silver',
+                name: 'เงิน (Silver)',
+                rho: 1.59e-8,
+                rhoText: '1.59 × 10⁻⁸',
+                wireColor: '#e2e8f0',
+                wireDark: '#94a3b8',
+                obstacleDensity: 12
+            },
+            {
+                id: 'copper',
+                name: 'ทองแดง (Copper)',
+                rho: 1.68e-8,
+                rhoText: '1.68 × 10⁻⁸',
+                wireColor: '#f97316',
+                wireDark: '#9a3412',
+                obstacleDensity: 16
+            },
+            {
+                id: 'gold',
+                name: 'ทองคำ (Gold)',
+                rho: 2.44e-8,
+                rhoText: '2.44 × 10⁻⁸',
+                wireColor: '#facc15',
+                wireDark: '#a16207',
+                obstacleDensity: 22
+            },
+            {
+                id: 'aluminum',
+                name: 'อะลูมิเนียม (Al)',
+                rho: 2.82e-8,
+                rhoText: '2.82 × 10⁻⁸',
+                wireColor: '#cbd5e1',
+                wireDark: '#64748b',
+                obstacleDensity: 26
+            },
+            {
+                id: 'iron',
+                name: 'เหล็ก (Iron)',
+                rho: 9.71e-8,
+                rhoText: '9.71 × 10⁻⁸',
+                wireColor: '#94a3b8',
+                wireDark: '#475569',
+                obstacleDensity: 45
+            },
+            {
+                id: 'nichrome',
+                name: 'นิโครม (Nichrome)',
+                rho: 1.10e-6,
+                rhoText: '1.10 × 10⁻⁶',
+                wireColor: '#fb7185',
+                wireDark: '#881337',
+                obstacleDensity: 95
+            }
+        ];
+
+        let labState = {
+            material: MATERIALS[1], // Default Copper
+            L: 2.0, // meters
+            A: 4.0, // mm^2
+            V: 12.0, // volts
+            R: 0.0084
+        };
+
+        // Canvas particles
+        let electrons = [];
+        let obstacles = [];
+        let canvas, ctx;
+        let animationFrameId;
+
+        function initMaterialButtons() {
+            const container = document.getElementById('material-buttons');
+            container.innerHTML = MATERIALS.map(mat => `
+                <button onclick="selectMaterial('${mat.id}')" id="mat-btn-${mat.id}"
+                    class="px-3 py-2 rounded-xl text-xs font-semibold border text-left flex items-center gap-2 transition-all ${mat.id === labState.material.id ? 'bg-purple-600 text-white border-purple-600 shadow-sm' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'}">
+                    <span class="w-3 h-3 rounded-full shrink-0 border border-white/50" style="background-color: ${mat.wireColor}"></span>
+                    <span class="truncate">${mat.name}</span>
+                </button>
+            `).join('');
+        }
+
+        function selectMaterial(matId) {
+            const found = MATERIALS.find(m => m.id === matId);
+            if (!found) return;
+            labState.material = found;
+            initMaterialButtons();
+            generateObstacles();
+            updateLabParams();
+        }
+
+        function resetLab() {
+            document.getElementById('slider-L').value = 2;
+            document.getElementById('slider-A').value = 4;
+            document.getElementById('slider-V').value = 12;
+            selectMaterial('copper');
+        }
+
+        function updateLabParams() {
+            labState.L = parseFloat(document.getElementById('slider-L').value);
+            labState.A = parseFloat(document.getElementById('slider-A').value);
+            labState.V = parseFloat(document.getElementById('slider-V').value);
+
+            // Update UI text labels
+            document.getElementById('display-rho').textContent = `${labState.material.rhoText} Ω·m`;
+            document.getElementById('display-L').textContent = `${labState.L.toFixed(1)} m`;
+            document.getElementById('display-A').textContent = `${labState.A.toFixed(1)} mm²`;
+            document.getElementById('display-V').textContent = `${labState.V.toFixed(1)} V`;
+            document.getElementById('canvas-voltage-label').textContent = `แรงดันแหล่งจ่าย V = ${labState.V.toFixed(1)} V`;
+
+            // Calculate R = rho * (L / A_in_m2)
+            // Note: 1 mm^2 = 1e-6 m^2
+            const areaInM2 = labState.A * 1e-6;
+            const R = labState.material.rho * (labState.L / areaInM2);
+            labState.R = R;
+
+            // Calculate Current I = V / R (Ohm's Law)
+            const I = labState.V / R;
+
+            // Update Step-by-Step Math Display
+            document.getElementById('calc-step-2').textContent = 
+                `R = (${labState.material.rhoText}) × (${labState.L.toFixed(1)} / ${labState.A.toFixed(1)}×10⁻⁶)`;
+            
+            document.getElementById('calc-result-ohm').textContent = `R = ${R.toFixed(4)} Ω`;
+            document.getElementById('calc-result-milliohm').textContent = `(หรือ ${(R * 1000).toFixed(2)} มิลลิโอห์ม mΩ)`;
+
+            document.getElementById('calc-ohm-step').textContent = 
+                `I = ${labState.V.toFixed(1)} V ÷ ${R.toFixed(4)} Ω`;
+            document.getElementById('calc-result-amp').textContent = `I = ${I >= 100 ? I.toFixed(1) : I.toFixed(2)} A`;
+
+            // Update Resistance Meter & Electron Speed Badge
+            let meterPercent = Math.min(100, Math.max(5, (Math.log10(R * 1000) / Math.log10(11000)) * 100));
+            if (isNaN(meterPercent)) meterPercent = 10;
+            
+            const meterBar = document.getElementById('resistance-meter-bar');
+            const levelText = document.getElementById('resistance-level-text');
+            const speedBadge = document.getElementById('sim-speed-badge');
+            const adviceBox = document.getElementById('tech-advice-box');
+            const adviceText = document.getElementById('tech-advice-text');
+
+            meterBar.style.width = `${meterPercent}%`;
+
+            if (R < 0.05) {
+                levelText.textContent = 'ต่ำมาก (กระแสไฟฟ้าไหลสะดวกสุดๆ)';
+                levelText.className = 'font-bold text-emerald-400';
+                speedBadge.textContent = 'ความเร็วอิเล็กตรอน: เร็วมาก ⚡';
+                speedBadge.className = 'px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-medium border border-emerald-500/30';
+                adviceBox.className = 'p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm text-emerald-900 flex items-start gap-2.5';
+                adviceText.innerHTML = '<strong>คำแนะนำงานช่าง:</strong> ความต้านทานต่ำมาก เหมาะสำหรับใช้เป็นสายเดินเมนไฟฟ้าหรือสายต่อเข้าเครื่องใช้ไฟฟ้ากำลังสูง ไม่เกิดความร้อนสะสม';
+            } else if (R < 0.5) {
+                levelText.textContent = 'ปานกลาง (เริ่มมีแรงต้านทาน)';
+                levelText.className = 'font-bold text-amber-400';
+                speedBadge.textContent = 'ความเร็วอิเล็กตรอน: ปานกลาง';
+                speedBadge.className = 'px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 font-medium border border-amber-500/30';
+                adviceBox.className = 'p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs sm:text-sm text-amber-900 flex items-start gap-2.5';
+                adviceText.innerHTML = '<strong>คำแนะนำงานช่าง:</strong> เริ่มมีความต้านทานปานกลาง หากนำไปใช้กับเครื่องใช้ไฟฟ้าที่กินกระแสสูง อาจเกิดภาวะแรงดันตก (ไฟตก) ที่ปลายสายได้';
+            } else {
+                levelText.textContent = 'สูงมาก (ต้านทานสูง เกิดความร้อนง่าย)';
+                levelText.className = 'font-bold text-rose-400';
+                speedBadge.textContent = 'ความเร็วอิเล็กตรอน: ช้า (ชนสิ่งกีดขวางบ่อย)';
+                speedBadge.className = 'px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 font-medium border border-rose-500/30';
+                adviceBox.className = 'p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs sm:text-sm text-rose-900 flex items-start gap-2.5';
+                adviceText.innerHTML = '<strong>คำแนะนำงานช่าง:</strong> ห้ามนำมาทำสายส่งไฟฟ้าเด็ดขาด! เพราะจะเกิดความร้อนสูงจนฉนวนละลาย แต่เหมาะสำหรับทำ <strong>"ขดลวดทำความร้อน"</strong> ในเตารีดหรือกาต้มน้ำร้อน';
+            }
+        }
+
+        function initCanvas() {
+            canvas = document.getElementById('wireCanvas');
+            if (!canvas) return;
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            electrons = [];
+            for (let i = 0; i < 45; i++) {
+                electrons.push({
+                    relX: Math.random(),
+                    relY: (Math.random() - 0.5) * 0.75,
+                    jitter: 0
+                });
+            }
+            generateObstacles();
+            animateWire();
+        }
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            const rect = canvas.parentElement.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+        }
+
+        function generateObstacles() {
+            obstacles = [];
+            const count = labState.material.obstacleDensity;
+            for (let i = 0; i < count; i++) {
+                obstacles.push({
+                    relX: 0.08 + Math.random() * 0.84,
+                    relY: (Math.random() - 0.5) * 0.76
+                });
+            }
+        }
+
+        function animateWire() {
+            if (!ctx || !canvas) return;
+            const w = canvas.width;
+            const h = canvas.height;
+            if (w === 0 || h === 0) {
+                animationFrameId = requestAnimationFrame(animateWire);
+                return;
+            }
+            ctx.clearRect(0, 0, w, h);
+
+            // Map L (1..10) to visual width (30% .. 88% of canvas width)
+            const wireWidth = w * (0.30 + (labState.L / 10) * 0.58);
+            // Map A (1..10) to visual height/radius (28px .. 124px)
+            const wireHeight = 28 + (labState.A / 10) * 96;
+            const radiusY = wireHeight / 2;
+            const radiusX = Math.min(22, radiusY * 0.45);
+
+            const startX = (w - wireWidth) / 2;
+            const endX = startX + wireWidth;
+            const centerY = h / 2;
+
+            // 1. Draw Connecting Thin Lead Wires to Battery
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(startX, centerY);
+            ctx.moveTo(endX, centerY);
+            ctx.lineTo(w, centerY);
+            ctx.stroke();
+
+            // 2. Draw 3D Cylinder Body Gradient
+            const bodyGrad = ctx.createLinearGradient(0, centerY - radiusY, 0, centerY + radiusY);
+            bodyGrad.addColorStop(0, labState.material.wireDark);
+            bodyGrad.addColorStop(0.3, labState.material.wireColor);
+            bodyGrad.addColorStop(0.7, labState.material.wireColor);
+            bodyGrad.addColorStop(1, labState.material.wireDark);
+
+            ctx.fillStyle = bodyGrad;
+            ctx.globalAlpha = 0.35;
+            ctx.beginPath();
+            ctx.ellipse(startX, centerY, radiusX, radiusY, 0, Math.PI / 2, (3 * Math.PI) / 2);
+            ctx.lineTo(endX, centerY - radiusY);
+            ctx.ellipse(endX, centerY, radiusX, radiusY, 0, (3 * Math.PI) / 2, Math.PI / 2);
+            ctx.closePath();
+            ctx.fill();
+
+            // Cylinder Outline
+            ctx.globalAlpha = 0.85;
+            ctx.strokeStyle = labState.material.wireColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 3. Draw Cross-Section Face (Right End Cap - Area A)
+            ctx.fillStyle = labState.material.wireColor;
+            ctx.globalAlpha = 0.45;
+            ctx.beginPath();
+            ctx.ellipse(endX, centerY, radiusX, radiusY, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            ctx.stroke();
+
+            // 4. Draw Atom Obstacles inside the wire
+            const visibleObstacles = Math.ceil(obstacles.length * (0.4 + (labState.L / 10) * 0.6));
+            for (let i = 0; i < visibleObstacles; i++) {
+                const obs = obstacles[i];
+                const ox = startX + obs.relX * wireWidth;
+                const oy = centerY + obs.relY * (wireHeight * 0.78);
+
+                ctx.fillStyle = 'rgba(244, 63, 94, 0.75)';
+                ctx.beginPath();
+                ctx.arc(ox, oy, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 5. Calculate Electron Speed proportional to V and inversely proportional to R
+            const voltageFactor = labState.V / 12.0;
+            const baseSpeed = (0.009 * voltageFactor) / (1 + Math.log10(1 + labState.R * 25));
+            const jitterAmount = Math.min(3.5, labState.R * 0.8);
+
+            // 6. Update and Draw Flowing Electrons
+            ctx.fillStyle = '#facc15';
+            ctx.shadowColor = '#facc15';
+            ctx.shadowBlur = 8;
+
+            electrons.forEach(el => {
+                el.relX += baseSpeed;
+                if (el.relX > 1) {
+                    el.relX = 0;
+                    el.relY = (Math.random() - 0.5) * 0.75;
+                }
+                const ex = startX + el.relX * wireWidth;
+                const wobble = (Math.random() - 0.5) * jitterAmount;
+                const ey = centerY + el.relY * (wireHeight * 0.78) + wobble;
+
+                ctx.beginPath();
+                ctx.arc(ex, ey, 3.2, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.shadowBlur = 0;
+
+            // 7. Dimension Labels on Canvas (L and A)
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = '600 12px Prompt, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`ความยาว L = ${labState.L.toFixed(1)} m`, w / 2, centerY - radiusY - 12);
+            
+            ctx.fillStyle = '#fcd34d';
+            ctx.fillText(`หน้าตัด A = ${labState.A.toFixed(1)} mm²`, endX, centerY + radiusY + 18);
+
+            animationFrameId = requestAnimationFrame(animateWire);
+        }
+
+
+        // ---------------------------------------------------------
+        // 3. QUIZ & PRACTICE LOGIC (Section 4)
+        // ---------------------------------------------------------
+        const QUIZ_QUESTIONS = [
+            {
+                q: '1. จากสมการ R = ρ(L/A) ตัวแปรใดหมายถึง "สภาพต้านทานไฟฟ้า" ซึ่งขึ้นอยู่กับชนิดของวัสดุ?',
+                options: [
+                    'R (อาร์)',
+                    'ρ (โร)',
+                    'L (แอล)',
+                    'A (เอ)'
+                ],
+                correct: 1,
+                explanation: 'ρ (อ่านว่า โร) คือ สภาพต้านทานไฟฟ้า (Resistivity) เป็นค่าเฉพาะตัวของวัสดุแต่ละชนิด มีหน่วยเป็น โอห์ม·เมตร (Ω·m)'
+            },
+            {
+                q: '2. ตามกฎของโอห์ม (I = V/R) หากลวดตัวนำเส้นหนึ่งมีขนาดเล็กลงและยาวขึ้นจนทำให้ความต้านทาน (R) เพิ่มขึ้นเป็น 2 เท่า ขณะที่แรงดันไฟฟ้า (V) คงที่ กระแสไฟฟ้า (I) จะเปลี่ยนแปลงอย่างไร?',
+                options: [
+                    'กระแสไฟฟ้า (I) เพิ่มขึ้นเป็น 2 เท่า',
+                    'กระแสไฟฟ้า (I) ลดลงเหลือครึ่งหนึ่ง (0.5 เท่า)',
+                    'กระแสไฟฟ้า (I) เท่าเดิมไม่เปลี่ยนแปลง',
+                    'กระแสไฟฟ้า (I) เพิ่มขึ้นเป็น 4 เท่า'
+                ],
+                correct: 1,
+                explanation: 'ตามกฎของโอห์ม I = V/R กระแสไฟฟ้า (I) แปรผกผันกับความต้านทาน (R) ดังนั้นเมื่อ R เพิ่มขึ้น 2 เท่า กระแสไฟฟ้าจึงไหลได้ลดลงเหลือครึ่งหนึ่ง'
+            },
+            {
+                q: '3. เพราะเหตุใดสายไฟที่ใช้เดินเมนหลักเข้าบ้าน หรือสายไฟเครื่องทำน้ำอุ่น จึงต้องใช้สายไฟที่มีขนาดเส้นใหญ่ (พื้นที่หน้าตัดมาก)?',
+                options: [
+                    'เพื่อเพิ่มความต้านทานไฟฟ้าให้กระแสไหลช้าลง',
+                    'เพื่อลดความต้านทานไฟฟ้า ทำให้กระแสไหลสะดวกและไม่เกิดความร้อนสะสม',
+                    'เพื่อให้ลวดมีน้ำหนักมากและแข็งแรงทนลม',
+                    'เพื่อเพิ่มค่าสภาพต้านทานไฟฟ้า (ρ) ของทองแดง'
+                ],
+                correct: 1,
+                explanation: 'ความต้านทานไฟฟ้า (R) แปรผกผันกับพื้นที่หน้าตัด (A) ยิ่งลวดเส้นใหญ่ (A มาก) ความต้านทานยิ่งน้อย ทำให้กระแสไฟฟ้าไหลผ่านได้สะดวกและไม่ร้อนจนไฟไหม้'
+            },
+            {
+                q: '4. ถ้าต้องการสร้างขดลวดทำความร้อนในเตารีดหรือเครื่องปิ้งขนมปัง ควรเลือกใช้วัสดุที่มีคุณสมบัติตามข้อใด?',
+                options: [
+                    'วัสดุที่มีสภาพต้านทานไฟฟ้า (ρ) สูง เช่น ลวดนิโครม',
+                    'วัสดุที่มีสภาพต้านทานไฟฟ้า (ρ) ต่ำที่สุด เช่น เงิน',
+                    'ลวดที่สั้นมากๆ และมีพื้นที่หน้าตัดใหญ่มากๆ',
+                    'วัสดุที่เป็นฉนวนไฟฟ้า เช่น พลาสติก'
+                ],
+                correct: 0,
+                explanation: 'อุปกรณ์ทำความร้อนต้องการเปลี่ยนพลังงานไฟฟ้าเป็นพลังงานความร้อน จึงต้องใช้วัสดุที่มีสภาพต้านทานไฟฟ้า (ρ) สูง เช่น ลวดนิโครม เพื่อต้านการไหลของอิเล็กตรอนจนเกิดความร้อน'
+            },
+            {
+                q: '5. สายไฟเส้นหนึ่งมีความต้านทานไฟฟ้า 4 โอห์ม เมื่อต่อเข้ากับแบตเตอรี่ขนาด 12 โวลต์ จะมีกระแสไฟฟ้าไหลผ่านสายไฟนี้กี่แอมแปร์?',
+                options: [
+                    '0.33 แอมแปร์',
+                    '3 แอมแปร์',
+                    '16 แอมแปร์',
+                    '48 แอมแปร์'
+                ],
+                correct: 1,
+                explanation: 'จากกฎของโอห์ม I = V ÷ R = 12 โวลต์ ÷ 4 โอห์ม = 3 แอมแปร์ (A)'
+            }
+        ];
+
+        let userAnswers = new Array(QUIZ_QUESTIONS.length).fill(null);
+        let quizSubmitted = false;
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = QUIZ_QUESTIONS.map((item, qIndex) => {
+                return `
+                    <div class="p-5 rounded-2xl border border-slate-200 bg-slate-50/40" id="q-box-${qIndex}">
+                        <p class="font-bold text-slate-800 text-sm sm:text-base mb-4">${item.q}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            ${item.options.map((opt, oIndex) => {
+                                let btnStyle = 'bg-white border-slate-200 text-slate-700 hover:border-sci-400 hover:bg-sci-50/50';
+                                let iconHtml = `<span class="w-6 h-6 rounded-full border border-slate-300 text-xs flex items-center justify-center shrink-0 font-bold">${['ก', 'ข', 'ค', 'ง'][oIndex]}</span>`;
+
+                                if (quizSubmitted) {
+                                    if (oIndex === item.correct) {
+                                        btnStyle = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-semibold ring-1 ring-emerald-500';
+                                        iconHtml = `<i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600 shrink-0"></i>`;
+                                    } else if (userAnswers[qIndex] === oIndex && oIndex !== item.correct) {
+                                        btnStyle = 'bg-rose-50 border-rose-500 text-rose-900';
+                                        iconHtml = `<i data-lucide="x-circle" class="w-5 h-5 text-rose-600 shrink-0"></i>`;
+                                    } else {
+                                        btnStyle = 'bg-white/60 border-slate-200 text-slate-400 opacity-70';
+                                    }
+                                } else if (userAnswers[qIndex] === oIndex) {
+                                    btnStyle = 'bg-sci-50 border-sci-600 text-sci-900 font-semibold ring-1 ring-sci-600';
+                                    iconHtml = `<span class="w-6 h-6 rounded-full bg-sci-600 text-white text-xs flex items-center justify-center shrink-0 font-bold">${['ก', 'ข', 'ค', 'ง'][oIndex]}</span>`;
+                                }
+
+                                return `
+                                    <button onclick="selectOption(${qIndex}, ${oIndex})" ${quizSubmitted ? 'disabled' : ''}
+                                        class="p-3.5 rounded-xl border text-left text-xs sm:text-sm flex items-center gap-3 transition-all ${btnStyle}">
+                                        ${iconHtml}
+                                        <span>${opt}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                        ${quizSubmitted ? `
+                            <div class="mt-4 p-3.5 rounded-xl text-xs sm:text-sm flex items-start gap-2.5 ${userAnswers[qIndex] === item.correct ? 'bg-emerald-100/70 text-emerald-900' : 'bg-amber-50 text-amber-900 border border-amber-200'}">
+                                <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5 ${userAnswers[qIndex] === item.correct ? 'text-emerald-600' : 'text-amber-600'}"></i>
+                                <div><strong>คำอธิบายเฉลย:</strong> ${item.explanation}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function selectOption(qIndex, oIndex) {
+            if (quizSubmitted) return;
+            userAnswers[qIndex] = oIndex;
+            document.getElementById('quiz-warning').classList.add('hidden');
+            renderQuiz();
+        }
+
+        function submitQuiz() {
+            if (userAnswers.includes(null)) {
+                document.getElementById('quiz-warning').classList.remove('hidden');
+                return;
+            }
+            quizSubmitted = true;
+            let score = 0;
+            QUIZ_QUESTIONS.forEach((q, idx) => {
+                if (userAnswers[idx] === q.correct) score++;
+            });
+
+            const badge = document.getElementById('quiz-score-badge');
+            badge.textContent = `คะแนนของคุณ: ${score} / ${QUIZ_QUESTIONS.length} คะแนน`;
+            badge.classList.remove('hidden');
+            if (score >= 4) {
+                badge.className = 'px-4 py-2 rounded-2xl bg-emerald-600 text-white font-bold text-sm shadow-sm';
+            } else {
+                badge.className = 'px-4 py-2 rounded-2xl bg-amber-500 text-white font-bold text-sm shadow-sm';
+            }
+
+            document.getElementById('btn-submit-quiz').classList.add('hidden');
+            document.getElementById('btn-retry-quiz').classList.remove('hidden');
+            renderQuiz();
+            badge.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function resetQuiz() {
+            userAnswers = new Array(QUIZ_QUESTIONS.length).fill(null);
+            quizSubmitted = false;
+            document.getElementById('quiz-score-badge').classList.add('hidden');
+            document.getElementById('btn-submit-quiz').classList.remove('hidden');
+            document.getElementById('btn-retry-quiz').classList.add('hidden');
+            renderQuiz();
+        }
+
+        function toggleSolution(id) {
+            const el = document.getElementById(id);
+            el.classList.toggle('hidden');
+        }
+
+
+        // ---------------------------------------------------------
+        // 4. NAVIGATION & INITIALIZATION
+        // ---------------------------------------------------------
+        function switchSection(secName) {
+            const sections = ['formula', 'lab', 'summary', 'quiz'];
+            sections.forEach(s => {
+                const el = document.getElementById(`sec-${s}`);
+                const dBtn = document.getElementById(`nav-${s}`);
+                const mBtn = document.getElementById(`m-nav-${s}`);
+
+                if (s === secName) {
+                    el.classList.remove('hidden');
+                    dBtn.classList.add('active');
+                    dBtn.classList.remove('text-slate-300');
+                    mBtn.classList.add('active');
+                    mBtn.classList.remove('text-slate-300', 'bg-slate-800', 'border', 'border-slate-700');
+                } else {
+                    el.classList.add('hidden');
+                    dBtn.classList.remove('active');
+                    dBtn.classList.add('text-slate-300');
+                    mBtn.classList.remove('active');
+                    mBtn.classList.add('text-slate-300', 'bg-slate-800', 'border', 'border-slate-700');
+                }
+            });
+
+            if (secName === 'lab') {
+                setTimeout(resizeCanvas, 50);
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            selectVar('R');
+            initMaterialButtons();
+            updateLabParams();
+            initCanvas();
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>
